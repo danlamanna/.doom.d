@@ -4,7 +4,8 @@
   (setq magit-repository-directories '(( "~/p" . 4 )))
 
   ;; when switching to magit-status save everything
-  (setq magit-save-repository-buffers 'dontask)
+  (setq magit-save-repository-buffers 'dontask
+        magit-delete-by-moving-to-trash nil)
 
   (transient-append-suffix 'magit-push '(0 -1)
     '("+c" "Create merge-request"
