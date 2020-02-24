@@ -1,4 +1,38 @@
 ;;; .doom.d/config.el -*- lexical-binding: t; -*-
+;;;
+(after! python
+  (defun dl-initialize-project-vars()
+    (when (or (f-equal? default-directory "~/p/stumpf-diva")
+              (f-child-of? default-directory "~/p/stumpf-diva"))
+      (setq
+       flycheck-python-mypy-executable  "~/p/stumpf-diva/.tox/mypy/bin/mypy"
+       flycheck-python-flake8-executable  "~/p/stumpf-diva/.tox/lint/bin/flake8"
+       flycheck-enabled-checkers '(python-flake8 python-mypy))))
+
+  (add-hook 'python-mode-hook 'dl-initialize-project-vars))
+
+(after! dap-mode
+  (dap-mode 1)
+  (dap-ui-mode 1)
+  (dap-tooltip-mode 1)
+  (tooltip-mode 1)
+
+  (setq dap-auto-show-output nil)
+
+  (dap-register-debug-template "stumpf-diva"
+                               (list
+                                :name "Python: Flask"
+                                :type "python"
+                                :request "launch"
+                                :module "flask"
+                                :cwd "~/p/stumpf-diva"
+                                :env '(("FLASK_APP" . "stumpf.wsgi")
+	                                     ("FLASK_ENV" . "development")
+	                                     ("FLASK_DEBUG" . "0"))
+                                :args (concat
+	                                     "run"
+	                                     " --no-debugger"
+	                                     " --no-reload"))))
 
 (after! magit
   (setq magit-repository-directories '(( "~/p" . 4 )))
