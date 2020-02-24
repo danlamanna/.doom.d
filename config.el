@@ -12,6 +12,17 @@
 
 (add-hook 'python-mode-hook 'dl-initialize-project-vars)
 
+
+(defun dl-jump-to-definition()
+  (interactive)
+  (if (lsp-request "textDocument/definition" (lsp--text-document-position-params))
+      (lsp-find-definition)
+    (dumb-jump-go)))
+
+
+
+(map! :n "z a" 'dl-jump-to-definition)
+
 (after! dap-mode
   (dap-mode 1)
   (dap-ui-mode 1)
