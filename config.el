@@ -1,15 +1,16 @@
 ;;; .doom.d/config.el -*- lexical-binding: t; -*-
 ;;;
-(after! python
-  (defun dl-initialize-project-vars()
-    (when (or (f-equal? default-directory "~/p/stumpf-diva")
-              (f-child-of? default-directory "~/p/stumpf-diva"))
-      (setq
-       flycheck-python-mypy-executable  "~/p/stumpf-diva/.tox/mypy/bin/mypy"
-       flycheck-python-flake8-executable  "~/p/stumpf-diva/.tox/lint/bin/flake8"
-       flycheck-enabled-checkers '(python-flake8 python-mypy))))
+(defun dl-initialize-project-vars()
+  (when (string-prefix-p (expand-file-name "~/p/stumpf-diva") default-directory)
+    (setq-local
+     flycheck-python-mypy-executable  (expand-file-name "~/p/stumpf-diva/.tox/mypy/bin/mypy")
+     flycheck-python-mypy-ini (expand-file-name "~/p/stumpf-diva/setup.cfg")
+     flycheck-python-flake8-executable  (expand-file-name "~/p/stumpf-diva/.tox/lint/bin/flake8")
+     flycheck-flake8rc (expand-file-name "~/p/stumpf-diva/setup.cfg"))
+    (flycheck-select-checker 'python-flake8)
+    (flycheck-select-checker 'python-mypy)))
 
-  (add-hook 'python-mode-hook 'dl-initialize-project-vars))
+(add-hook 'python-mode-hook 'dl-initialize-project-vars)
 
 (after! dap-mode
   (dap-mode 1)
