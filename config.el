@@ -87,6 +87,19 @@
 
 ;; contextual grep
 ;; deadgrep improvements
+(defun dl-run-tox-tests()
+  (interactive)
+  (let ((target (ivy-completing-read "target" (dl-get-tox-targets))))
+    (if (string= target "all")
+        (compile "tox")
+      (compile (format "tox -e %s" target)))))
+
+(defun dl-get-tox-targets()
+  (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
+    (append '("all") (s-lines (s-trim (shell-command-to-string "tox --listenvs"))))))
+
+(map! :map python-mode-map
+      :n "g t" 'dl-run-tox-tests)
 
 (map! :map compilation-mode-map
       :n "g r" 'recompile)
