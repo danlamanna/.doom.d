@@ -88,6 +88,9 @@
 ;; contextual grep
 ;; deadgrep improvements
 
+(map! :map compilation-mode-map
+      :n "g r" 'recompile)
+
 (map! :n "z z" 'evil-avy-goto-char-timer)
 (map! :n "z s" 'swiper)
 (map! :n "z r" 'er/expand-region)
