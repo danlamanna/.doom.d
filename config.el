@@ -85,10 +85,6 @@
 ;;             (setq smooth-scroll-margin 20)
 ;;             (smooth-scrolling-mode 1)))
 
-;; expand region
-;; key chords
-;; dumb jump
-
 ;; contextual grep
 ;; deadgrep improvements
 
