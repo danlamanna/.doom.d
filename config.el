@@ -55,6 +55,9 @@
 (after! magit
   (setq magit-repository-directories '(( "~/p" . 4 )))
 
+  ;; word-level diff highlighting
+  (setq magit-diff-refine-hunk 'all)
+
   ;; when switching to magit-status save everything
   (setq magit-save-repository-buffers 'dontask
         magit-delete-by-moving-to-trash nil)
