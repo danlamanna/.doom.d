@@ -110,8 +110,8 @@
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word))
   :config
-  ;; Suppress only the popup for copilot indentation warnings (still logs them)
-  (add-to-list 'warning-suppress-types '(copilot--infer-indentation-offset)))
+  ;; Suppress copilot indentation warnings
+  (add-to-list 'warning-suppress-log-types 'copilot--infer-indentation-offset))
 
 ;; https://discourse.doomemacs.org/t/permanently-display-workspaces-in-the-tab-bar/4088
 (after! persp-mode
