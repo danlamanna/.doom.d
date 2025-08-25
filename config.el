@@ -1,146 +1,128 @@
-;;; .doom.d/config.el -*- lexical-binding: t; -*-
-;;;
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
 
 
-(defun dl-initialize-project-vars()
-  (when (buffer-file-name)
-    (if (string-prefix-p (expand-file-name "~/p/stumpf-diva") default-directory)
-        (progn
-          (setq-local
-           flycheck-python-mypy-executable  (expand-file-name "~/p/stumpf-diva/.tox/mypy/bin/mypy")
-           flycheck-python-mypy-ini (expand-file-name "~/p/stumpf-diva/setup.cfg")
-           flycheck-python-flake8-executable  (expand-file-name "~/p/stumpf-diva/.tox/lint/bin/flake8")
-           flycheck-flake8rc (expand-file-name "~/p/stumpf-diva/setup.cfg"))
-          (flycheck-select-checker 'python-flake8)
-          (flycheck-select-checker 'python-mypy))
-      (if (string-prefix-p (expand-file-name "~/p/stade") default-directory)
-          (progn
-            (setq-local
-             flycheck-python-mypy-executable  (expand-file-name "~/p/stade/.tox/typing/bin/mypy")
-             flycheck-python-mypy-ini (expand-file-name "~/p/stade/mypy.ini")
-             flycheck-python-flake8-executable  (expand-file-name "~/p/stade/.tox/lint/bin/flake8")
-             flycheck-flake8rc (expand-file-name "~/p/stade/tox.ini"))
-            (flycheck-select-checker 'python-flake8)
-            (flycheck-select-checker 'python-mypy))))))
+(when noninteractive
+(add-to-list 'doom-env-whitelist "^SSH_"))
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets. It is optional.
+;; (setq user-full-name "John Doe"
+;;       user-mail-address "john@doe.com")
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom:
+;;
+;; - `doom-font' -- the primary font to use
+;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
+;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;; - `doom-symbol-font' -- for symbols
+;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
+;;
+;; See 'C-h v doom-font' for documentation and more examples of what they
+;; accept. For example:
+;;
+;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+;;
+;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
+;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
+;; refresh your font settings. If Emacs still can't find your font, it likely
+;; wasn't installed correctly. Font issues are rarely Doom issues!
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+(setq doom-theme 'doom-one)
+;(setq doom-theme 'doom-challenger-deep)
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type nil)
+
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/org/")
 
 
-(add-hook 'python-mode-hook 'dl-initialize-project-vars)
+;; Whenever you reconfigure a package, make sure to wrap your config in an
+;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;;
+;;   (after! PACKAGE
+;;     (setq x y))
+;;
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
 
 
+;; https://discourse.doomemacs.org/t/why-is-my-path-being-shown-as-an-ellipsis-and-how-do-i-reveal-it/3363
+(advice-add '+emacs-lisp-truncate-pin :override (lambda () ()) )
+
+(after! super-save
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t)
+  (setq super-save-delete-trailing-whitespace 'except-current-line))
 
 
-(after! dap-mode
-  (dap-mode 1)
-  (dap-ui-mode 1)
-  (dap-tooltip-mode 1)
-  (tooltip-mode 1)
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word))
+  :config
+  ;; Suppress only the popup for copilot indentation warnings (still logs them)
+  (add-to-list 'warning-suppress-types '(copilot--infer-indentation-offset)))
 
-  (setq dap-auto-show-output nil)
+;; https://discourse.doomemacs.org/t/permanently-display-workspaces-in-the-tab-bar/4088
+(after! persp-mode
+  ;; alternative, non-fancy version which only centers the output of +workspace--tabline
+  (defun workspaces-formatted ()
+    (+doom-dashboard--center (frame-width) (+workspace--tabline)))
 
-  (dap-register-debug-template "stumpf-diva"
-                               (list
-                                :name "Python: Flask"
-                                :type "python"
-                                :request "launch"
-                                :module "flask"
-                                :cwd "~/p/stumpf-diva"
-                                :env '(("FLASK_APP" . "stumpf.wsgi")
-	                                     ("FLASK_ENV" . "development")
-	                                     ("FLASK_DEBUG" . "0"))
-                                :args (concat
-	                                     "run"
-	                                     " --no-debugger"
-	                                     " --no-reload"))))
+  (defun hy/invisible-current-workspace ()
+    "The tab bar doesn't update when only faces change (i.e. the
+current workspace), so we invisibly print the current workspace
+name as well to trigger updates"
+    (propertize (safe-persp-name (get-current-persp)) 'invisible t))
 
-(after! magit
-  (setq magit-repository-directories '(( "~/p" . 4 )))
+  (customize-set-variable 'tab-bar-format '(workspaces-formatted tab-bar-format-align-right hy/invisible-current-workspace))
 
-  ;; word-level diff highlighting
-  (setq magit-diff-refine-hunk 'all)
+  ;; don't show current workspaces when we switch, since we always see them
+  (advice-add #'+workspace/display :override #'ignore)
+  ;; same for renaming and deleting (and saving, but oh well)
+  (advice-add #'+workspace-message :override #'ignore))
 
-  ;; when switching to magit-status save everything
-  (setq magit-save-repository-buffers 'dontask
-        magit-delete-by-moving-to-trash nil)
+;; need to run this later for it to not break frame size for some reason
+(run-at-time nil nil (cmd! (tab-bar-mode +1)))
 
-  (transient-append-suffix 'magit-push '(0 -1)
-    '("+c" "Create merge-request"
-      "--push-option=merge_request.create"))
-
-  (transient-append-suffix 'magit-push '(0 -1)
-    '("+d" "Against master"
-      "--push-option=merge_request.target=master"))
-
-  (transient-append-suffix 'magit-push '(0 -1)
-    '("+m" "Merge on success"
-      "--push-option=merge_request.merge_when_pipeline_succeeds")))
-
-(after! company
-  (setq company-show-numbers t
-        company-minimum-prefix-length 1
-        company-idle-delay 0.0))
-
-(after! avy
-  (setq avy-all-windows t
-        avy-style 'pre))
-
-;; (use-package smooth-scrolling
-;;   :config (progn
-;;             (setq smooth-scroll-margin 20)
-;;             (smooth-scrolling-mode 1)))
-
-;; contextual grep
-;; deadgrep improvements
-(defun dl-run-tox-tests()
-  (interactive)
-  (let ((target (ivy-completing-read "target" (dl-get-tox-targets))))
-    (if (string= target "all")
-        (compile "tox")
-      (compile (format "tox -e %s" target)))))
-
-(defun dl-get-tox-targets()
-  (projectile-with-default-dir (projectile-ensure-project (projectile-project-root))
-    (append '("all") (s-lines (s-trim (shell-command-to-string "tox --listenvs"))))))
-
-(map! :map python-mode-map
-      :n "g t" 'dl-run-tox-tests)
-
-(map! :map compilation-mode-map
-      :n "g r" 'recompile)
-
-(map! :n "z z" 'evil-avy-goto-char-timer)
-(map! :n "z s" 'swiper)
-(map! :n "z r" 'er/expand-region)
-(map! :n "z f" 'projectile-find-file-other-window)
-
-(after! company-lsp
-  (setq company-lsp-cache-candidates 'auto)
-  (add-to-list 'company-lsp-filter-candidates '(mspyls . t))
-  (defun company-lsp--on-completion (response prefix)
-    "Handle completion RESPONSE.
-PREFIX is a string of the prefix when the completion is requested.
-Return a list of strings as the completion candidates."
-    (let* ((incomplete (and (hash-table-p response) (gethash "isIncomplete" response)))
-           (items (cond ((hash-table-p response) (gethash "items" response))
-                        ((sequencep response) response)))
-           (candidates (mapcar (lambda (item)
-                                 (company-lsp--make-candidate item prefix))
-                               (lsp--sort-completions items)))
-           (server-id (lsp--client-server-id (lsp--workspace-client lsp--cur-workspace)))
-           (should-filter (or (eq company-lsp-cache-candidates 'auto) ; change from t to 'auto
-                              (and (null company-lsp-cache-candidates)
-                                   (company-lsp--get-config company-lsp-filter-candidates server-id)))))
-      (when (null company-lsp--completion-cache)
-        (add-hook 'company-completion-cancelled-hook #'company-lsp--cleanup-cache nil t)
-        (add-hook 'company-completion-finished-hook #'company-lsp--cleanup-cache nil t))
-      (when (eq company-lsp-cache-candidates 'auto)
-        ;; Only cache candidates on auto mode. If it's t company caches the
-        ;; candidates for us.
-        (company-lsp--cache-put prefix (company-lsp--cache-item-new candidates incomplete)))
-      (if should-filter
-          (company-lsp--filter-candidates candidates prefix)
-        candidates))))
-
-(use-package! super-save
-  :config (progn
-            (setq super-save-auto-save-when-idle nil)
-            (super-save-mode +1)))
+;; Make magit-status the default action when selecting projects with projectile
+(after! projectile
+  (setq projectile-switch-project-action #'magit-status))
