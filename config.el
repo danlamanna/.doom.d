@@ -89,9 +89,21 @@
   (setq super-save-delete-trailing-whitespace 'except-current-line))
 
 
+;; Load copilot whitelist configuration if it exists
+(load (expand-file-name "~/.config/doom/copilot-whitelist.el") t)
+
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
-  :hook (prog-mode . copilot-mode)
+  :hook (prog-mode . (lambda ()
+                       (when buffer-file-name
+                         (let ((expanded-file (expand-file-name buffer-file-name))
+                               (is-allowed nil))
+                           (when (boundp 'copilot-allowed-directories)
+                             (dolist (dir copilot-allowed-directories)
+                               (when (string-prefix-p (expand-file-name dir) expanded-file)
+                                 (setq is-allowed t))))
+                           (when is-allowed
+                             (copilot-mode))))))
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
