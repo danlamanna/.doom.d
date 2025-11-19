@@ -5,7 +5,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ignored-local-variable-values '((apheleia-formatter black isort)))
- '(package-selected-packages '(chezmoi forge talonscript-mode)))
+ '(package-selected-packages '(chezmoi forge mermaid-mode talonscript-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

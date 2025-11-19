@@ -57,6 +57,7 @@
 (package! super-save :recipe (:host github :repo "bbatsov/super-save"))
 
 (package! copilot :recipe (:host github :repo "copilot-emacs/copilot.el"))
+(package! chezmoi :recipe (:host github :repo "tuh8888/chezmoi.el"))
 
 
 (package! talonscript-mode :recipe (:host github :repo "jcaw/talonscript-mode" :files ("talonscript-mode.el")))
