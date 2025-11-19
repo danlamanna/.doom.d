@@ -138,3 +138,9 @@ name as well to trigger updates"
 ;; Make magit-status the default action when selecting projects with projectile
 (after! projectile
   (setq projectile-switch-project-action #'magit-status))
+
+;; Save all project files when opening magit-status
+(after! magit
+  (add-hook 'magit-status-mode-hook
+            (lambda ()
+              (projectile-save-project-buffers))))
