@@ -94,24 +94,44 @@
 
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
-  :hook (prog-mode . (lambda ()
-                       (when buffer-file-name
-                         (let ((expanded-file (expand-file-name buffer-file-name))
-                               (is-allowed nil))
-                           (when (boundp 'copilot-allowed-directories)
-                             (dolist (dir copilot-allowed-directories)
-                               (when (string-prefix-p (expand-file-name dir) expanded-file)
-                                 (setq is-allowed t))))
-                           (when is-allowed
-                             (copilot-mode))))))
+  :hook copilot-mode
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word))
   :config
-  ;; Suppress copilot indentation warnings
-  (add-to-list 'warning-suppress-log-types 'copilot--infer-indentation-offset))
+  ;; Suppress only the popup for copilot indentation warnings (still logs them)
+  (add-to-list 'warning-suppress-types 'copilot--infer-indentation-offset)
+
+  ;; Safe projects file
+  (defvar copilot-safe-projects-file
+    (expand-file-name ".copilot-safe-projects" doom-user-dir))
+
+  ;; Check if current project is safe
+  (defun copilot--project-safe-p ()
+    (when-let ((root (projectile-project-root)))
+      (and (file-exists-p copilot-safe-projects-file)
+           (with-temp-buffer
+             (insert-file-contents copilot-safe-projects-file)
+             (member root (split-string (buffer-string) "\n" t))))))
+
+  ;; Wrap copilot-mode to check safety
+  (define-advice copilot-mode (:around (fn &optional arg) check-safe-project)
+    "Only enable copilot in safe projects. Prompt if interactive, silently block if not."
+    (if (and (> (prefix-numeric-value arg) 0)  ; Enabling, not disabling
+             (projectile-project-root)          ; In a project
+             (not (copilot--project-safe-p)))   ; Not safe yet
+        ;; Unsafe project - prompt if interactive, block if from hook
+        (when (and (called-interactively-p 'interactive)
+                   (y-or-n-p (format "Enable copilot in %s and mark as safe? "
+                                     (projectile-project-root))))
+          ;; Add to safe projects
+          (write-region (concat (projectile-project-root) "\n") nil
+                        copilot-safe-projects-file 'append)
+          (funcall fn arg))
+      ;; Safe project, no project, or disabling - proceed normally
+      (funcall fn arg))))
 
 ;; https://discourse.doomemacs.org/t/permanently-display-workspaces-in-the-tab-bar/4088
 (after! persp-mode
