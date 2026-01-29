@@ -164,3 +164,7 @@ name as well to trigger updates"
   (add-hook 'magit-status-mode-hook
             (lambda ()
               (projectile-save-project-buffers))))
+
+(after! lsp-mode
+  ;; https://docs.astral.sh/ty/reference/editor-settings/#diagnosticmode
+  (lsp-register-custom-settings '(("ty.diagnosticMode" "off"))))
