@@ -83,10 +83,13 @@
 ;; https://discourse.doomemacs.org/t/why-is-my-path-being-shown-as-an-ellipsis-and-how-do-i-reveal-it/3363
 (advice-add '+emacs-lisp-truncate-pin :override (lambda () ()) )
 
+(use-package! super-save
+  :demand t)
+
 (after! super-save
-  (super-save-mode +1)
   (setq super-save-auto-save-when-idle t)
-  (setq super-save-delete-trailing-whitespace 'except-current-line))
+  (setq super-save-delete-trailing-whitespace 'except-current-line)
+  (super-save-mode +1))
 
 
 ;; Load copilot whitelist configuration if it exists
