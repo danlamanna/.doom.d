@@ -181,3 +181,6 @@ name as well to trigger updates"
   :demand t)
 (after! which-key
   (which-key-mode +1))
+
+(after! flymake
+  (setq flymake-show-diagnostics-at-end-of-line t))
