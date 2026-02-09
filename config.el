@@ -171,3 +171,8 @@ name as well to trigger updates"
 (after! lsp-mode
   ;; https://docs.astral.sh/ty/reference/editor-settings/#diagnosticmode
   (lsp-register-custom-settings '(("ty.diagnosticMode" "off"))))
+
+(use-package! goto-addr
+  :demand t)
+(after! goto-addr
+  (global-goto-address-mode))
