@@ -176,3 +176,8 @@ name as well to trigger updates"
   :demand t)
 (after! goto-addr
   (global-goto-address-mode))
+
+(use-package! which-key
+  :demand t)
+(after! which-key
+  (which-key-mode +1))
