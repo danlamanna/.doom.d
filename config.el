@@ -177,6 +177,11 @@ name as well to trigger updates"
 (after! goto-addr
   (global-goto-address-mode))
 
+(use-package! xt-mouse
+  :demand t)
+(after! xt-mouse
+  (xterm-mouse-mode))
+
 (use-package! which-key
   :demand t)
 (after! which-key
