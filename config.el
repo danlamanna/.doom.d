@@ -47,10 +47,17 @@
 (setq org-directory "~/org/")
 
 
-;; Whenever you reconfigure a package, make sure to wrap your config in an
-;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;; Whenever you reconfigure a package, make sure to wrap your config in a
+;; `with-eval-after-load' block, otherwise Doom's defaults may override your
+;; settings. E.g.
 ;;
-;;   (after! PACKAGE
+;;   (with-eval-after-load 'PACKAGE
+;;     (setq x y))
+;;
+;; Or use the `:config' section of `use-package'. E.g.
+;;
+;;   (use-package PACKAGE
+;;     :config
 ;;     (setq x y))
 ;;
 ;; The exceptions to this rule:
@@ -63,8 +70,8 @@
 ;; Here are some additional functions/macros that will help you configure Doom.
 ;;
 ;; - `load!' for loading external *.el files relative to this one
-;; - `use-package!' for configuring packages
-;; - `after!' for running code after a package has loaded
+;; - `use-package' for configuring packages (with standard `:config' blocks)
+;; - `with-eval-after-load' for running code after a package has loaded
 ;; - `add-load-path!' for adding directories to the `load-path', relative to
 ;;   this file. Emacs searches the `load-path' when you load packages with
 ;;   `require' or `use-package'.
@@ -83,10 +90,9 @@
 ;; https://discourse.doomemacs.org/t/why-is-my-path-being-shown-as-an-ellipsis-and-how-do-i-reveal-it/3363
 (advice-add '+emacs-lisp-truncate-pin :override (lambda () ()) )
 
-(use-package! super-save
-  :demand t)
-
-(after! super-save
+(use-package super-save
+  :demand t
+  :config
   (setq super-save-auto-save-when-idle t)
   (setq super-save-delete-trailing-whitespace 'except-current-line)
   (super-save-mode +1))
@@ -96,7 +102,7 @@
 (load (expand-file-name "~/.config/doom/copilot-whitelist.el") t)
 
 ;; accept completion from copilot and fallback to company
-(use-package! copilot
+(use-package copilot
   :hook copilot-mode
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
@@ -137,7 +143,7 @@
       (funcall fn arg))))
 
 ;; https://discourse.doomemacs.org/t/permanently-display-workspaces-in-the-tab-bar/4088
-(after! persp-mode
+(with-eval-after-load 'persp-mode
   ;; alternative, non-fancy version which only centers the output of +workspace--tabline
   (defun workspaces-formatted ()
     (+doom-dashboard--center (frame-width) (+workspace--tabline)))
@@ -159,33 +165,33 @@ name as well to trigger updates"
 (run-at-time nil nil (cmd! (tab-bar-mode +1)))
 
 ;; Make magit-status the default action when selecting projects with projectile
-(after! projectile
+(with-eval-after-load 'projectile
   (setq projectile-switch-project-action #'magit-status))
 
 ;; Save all project files when opening magit-status
-(after! magit
+(with-eval-after-load 'magit
   (add-hook 'magit-status-mode-hook
             (lambda ()
               (projectile-save-project-buffers))))
 
-(after! lsp-mode
+(with-eval-after-load 'lsp-mode
   ;; https://docs.astral.sh/ty/reference/editor-settings/#diagnosticmode
   (lsp-register-custom-settings '(("ty.diagnosticMode" "off"))))
 
-(use-package! goto-addr
-  :demand t)
-(after! goto-addr
+(use-package goto-addr
+  :demand t
+  :config
   (global-goto-address-mode))
 
-(use-package! xt-mouse
-  :demand t)
-(after! xt-mouse
+(use-package xt-mouse
+  :demand t
+  :config
   (xterm-mouse-mode))
 
-(use-package! which-key
-  :demand t)
-(after! which-key
+(use-package which-key
+  :demand t
+  :config
   (which-key-mode +1))
 
-(after! flymake
+(with-eval-after-load 'flymake
   (setq flymake-show-diagnostics-at-end-of-line t))
