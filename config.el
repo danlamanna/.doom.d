@@ -40,11 +40,11 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type nil)
+(setopt display-line-numbers-type nil)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setopt org-directory "~/org/")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in a
@@ -52,13 +52,13 @@
 ;; settings. E.g.
 ;;
 ;;   (with-eval-after-load 'PACKAGE
-;;     (setq x y))
+;;     (setopt option-name value))
 ;;
 ;; Or use the `:config' section of `use-package'. E.g.
 ;;
 ;;   (use-package PACKAGE
 ;;     :config
-;;     (setq x y))
+;;     (setopt option-name value))
 ;;
 ;; The exceptions to this rule:
 ;;
@@ -93,8 +93,8 @@
 (use-package super-save
   :demand t
   :config
-  (setq super-save-auto-save-when-idle t)
-  (setq super-save-delete-trailing-whitespace 'except-current-line)
+  (setopt super-save-auto-save-when-idle t)
+  (setopt super-save-delete-trailing-whitespace 'except-current-line)
   (super-save-mode +1))
 
 
@@ -154,7 +154,7 @@ current workspace), so we invisibly print the current workspace
 name as well to trigger updates"
     (propertize (safe-persp-name (get-current-persp)) 'invisible t))
 
-  (customize-set-variable 'tab-bar-format '(workspaces-formatted tab-bar-format-align-right hy/invisible-current-workspace))
+  (setopt tab-bar-format '(workspaces-formatted tab-bar-format-align-right hy/invisible-current-workspace))
 
   ;; don't show current workspaces when we switch, since we always see them
   (advice-add #'+workspace/display :override #'ignore)
@@ -166,7 +166,7 @@ name as well to trigger updates"
 
 ;; Make magit-status the default action when selecting projects with projectile
 (with-eval-after-load 'projectile
-  (setq projectile-switch-project-action #'magit-status))
+  (setopt projectile-switch-project-action #'magit-status))
 
 ;; Save all project files when opening magit-status
 (with-eval-after-load 'magit
@@ -194,4 +194,4 @@ name as well to trigger updates"
   (which-key-mode +1))
 
 (with-eval-after-load 'flymake
-  (setq flymake-show-diagnostics-at-end-of-line t))
+  (setopt flymake-show-diagnostics-at-end-of-line t))
